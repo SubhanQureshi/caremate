@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareMate - Main Screen</title>
+
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <style>
+        /* Smooth Background Animation */
+        @keyframes backgroundFade {
+            0% { background-color: #e0f7fa; }
+            50% { background-color: #80cbc4; }
+            100% { background-color: #e0f7fa; }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            animation: backgroundFade 10s infinite;
+        }
+
+        /* Header + Footer */
+        header, footer {
+            background-color: #00735c;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            height: 70px;
+        }
+
+        header img {
+            width: 100px;
+            margin-right: 15px;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .welcome-text {
+            font-size: 1rem;
+            margin-right: 10px;
+        }
+
+        .logout-btn {
+            background-color: #016A43;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+            cursor: pointer;
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .logout-btn:hover {
+            background-color: #004d32;
+            box-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        /* Navigation */
+        nav {
+            background-color: #00735c;
+            display: flex;
+            justify-content: center;
+            padding: 15px 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            background-color: #016A43;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        nav a i {
+            margin-right: 8px;
+        }
+
+        nav a:hover,
+        nav a:focus {
+            background-color: #004d32;
+            box-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99;
+            outline: none;
+        }
+
+        /* Visible keyboard focus */
+        nav a:focus-visible {
+            outline: 3px solid #00ff99;
+        }
+
+        /* Main Section */
+        main {
+            background: url('https://static.vecteezy.com/system/resources/previews/006/460/479/large_2x/health-trackers-for-workers-gradient-icon-for-dark-theme-monitoring-employee-wellbeing-wearing-fitness-tracker-thin-line-color-symbol-modern-style-pictogram-isolated-outline-drawing-vector.jpg')
+            center/cover no-repeat;
+            color: white;
+            text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+            padding: 30px 20px;
+            text-align: center;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .welcome-container {
+            background-color: rgba(0, 115, 92, 0.8);
+            padding: 30px;
+            border-radius: 10px;
+            max-width: 600px;
+            backdrop-filter: blur(5px);
+        }
+
+        main h2 {
+            font-size: 2.5rem;
+            margin-bottom: 15px;
+            color: white;
+        }
+
+        main p {
+            font-size: 1.2rem;
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        .user-welcome {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: #00ff99;
+            margin-bottom: 20px;
+        }
+
+        .loading {
+            color: #00ff99;
+            font-style: italic;
+        }
+
+        /* Footer */
+        footer {
+            justify-content: center;
+            text-align: center;
+        }
+
+        /* Mobile Responsiveness */
+        @media (max-width: 600px) {
+            nav {
+                flex-wrap: wrap;
+                padding: 10px;
+            }
+            nav a {
+                margin: 5px;
+                font-size: 0.9rem;
+            }
+            header h1 {
+                font-size: 1.6rem;
+            }
+            main h2 {
+                font-size: 1.6rem;
+            }
+            .header-content {
+                flex-direction: column;
+                gap: 10px;
+            }
+            .user-info {
+                flex-direction: column;
+                gap: 5px;
+            }
+            .welcome-text {
+                font-size: 0.9rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header>
+        <div class="header-content">
+            <div style="display: flex; align-items: center;">
+                <img src="Logo.png" alt="CareMate Logo">
+                <h1>CareMate</h1>
+            </div>
+            <div class="user-info">
+                <span class="welcome-text" id="welcomeText">Loading...</span>
+                <button class="logout-btn" onclick="logout()">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Navigation (Accessible) -->
+    <nav aria-label="Main Navigation">
+        <a href="MainScreen.html" aria-label="Go to Home"><i class="fas fa-home"></i> Home</a>
+        <a href="mental-health.html" aria-label="Go to Mental Health Section"><i class="fas fa-brain"></i> Mental Health</a>
+        <a href="guided-support.html" aria-label="Go to Support Page"><i class="fas fa-hands-helping"></i> Support</a>
+        <a href="Sleep tracker.html" aria-label="Go to Sleep Tracker"><i class="fas fa-bed"></i> Sleep Tracker</a>
+    </nav>
+
+    <!-- Main Body -->
+    <main>
+        <div class="welcome-container">
+            <h2>Welcome to CareMate!</h2>
+            <div class="user-welcome" id="userWelcome">
+                <span class="loading">Loading your profile...</span>
+            </div>
+            <p>Your companion in managing mental health, tasks, and well-being.</p>
+            <p>Track your mood, practice mindfulness, monitor your sleep, and find support.</p>
+            <p>We're glad to have you here on your wellness journey.</p>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer>
+        <p>&copy; 2024 CareMate. All rights reserved.</p>
+    </footer>
+
+    <!-- Firebase Authentication Script -->
+    <script type="module">
+        import { auth, onAuthStateChanged, signOut, database, ref, get } from './firebase-config.js';
+
+        // Check authentication state when page loads
+        onAuthStateChanged(auth, async (user) => {
+            const welcomeText = document.getElementById('welcomeText');
+            const userWelcome = document.getElementById('userWelcome');
+
+            if (user) {
+                // User is signed in
+                console.log('User is signed in:', user.email);
+                
+                try {
+                    // Get user data from database
+                    const userRef = ref(database, 'users/' + user.uid);
+                    const snapshot = await get(userRef);
+                    
+                    let displayName;
+                    
+                    if (snapshot.exists()) {
+                        const userData = snapshot.val();
+                        displayName = userData.displayName || user.displayName || user.email.split('@')[0];
+                    } else {
+                        // Fallback to auth user info
+                        displayName = user.displayName || user.email.split('@')[0];
+                    }
+                    
+                    // Update UI with user information
+                    welcomeText.textContent = `Welcome, ${displayName}!`;
+                    userWelcome.innerHTML = `Hello, <strong>${displayName}</strong>!`;
+                    
+                } catch (error) {
+                    console.error('Error getting user data:', error);
+                    // Fallback to basic user info
+                    const displayName = user.displayName || user.email.split('@')[0];
+                    welcomeText.textContent = `Welcome, ${displayName}!`;
+                    userWelcome.innerHTML = `Hello, <strong>${displayName}</strong>!`;
+                }
+            } else {
+                // User is signed out, redirect to login
+                console.log('User is signed out, redirecting to login...');
+                window.location.href = 'login.html';
+            }
+        });
+
+        // Logout function
+        window.logout = async function() {
+            if (confirm('Are you sure you want to logout?')) {
+                try {
+                    await signOut(auth);
+                    console.log('User signed out successfully');
+                    // Redirect happens automatically due to onAuthStateChanged
+                } catch (error) {
+                    console.error('Error signing out:', error);
+                    alert('Error signing out. Please try again.');
+                }
+            }
+        };
+
+        // Add authentication check for navigation
+        document.addEventListener('DOMContentLoaded', function() {
+            const navLinks = document.querySelectorAll('nav a');
+            navLinks.forEach(link => {
+                if (link.getAttribute('href') !== 'MainScreen.html') {
+                    link.addEventListener('click', function(e) {
+                        onAuthStateChanged(auth, (user) => {
+                            if (!user) {
+                                e.preventDefault();
+                                alert('Please login to access this page.');
+                                window.location.href = 'login.html';
+                            }
+                        });
+                    });
+                }
+            });
+        });
+    </script>
+</body>
+</html>

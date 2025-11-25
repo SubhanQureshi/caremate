@@ -1,0 +1,259 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Gratitude Journaling</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e8f7e8;
+      margin: 0;
+      padding: 20px;
+    }
+    header {
+      text-align: center;
+      background-color: #003d2e;
+      padding: 20px 0;
+    }
+    header h1 {
+      color: #ffffff;
+      margin: 0;
+      font-size: 2rem;
+    }
+    textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      font-size: 1rem;
+      margin-top: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+    button {
+      display: block;
+      margin: 20px auto;
+      background-color: #00735c;
+      color: white;
+      padding: 10px 20px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+    button:hover {
+      background-color: #005f4b;
+    }
+    button:disabled {
+      background-color: #cccccc;
+      cursor: not-allowed;
+    }
+    .entries-container {
+      margin-top: 30px;
+    }
+    .entry {
+      background: white;
+      padding: 15px;
+      margin: 10px 0;
+      border-radius: 5px;
+      border-left: 4px solid #00735c;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    }
+    .entry-date {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    .entry-content {
+      font-size: 1rem;
+      line-height: 1.4;
+    }
+    .loading {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      padding: 20px;
+    }
+    .error-message {
+      color: #ff0000;
+      text-align: center;
+      padding: 10px;
+      background-color: #ffe6e6;
+      border-radius: 5px;
+      margin: 10px 0;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Gratitude Journaling</h1>
+  </header>
+  
+  <div id="errorMessage" class="error-message"></div>
+  
+  <textarea id="journal" placeholder="Write what you are grateful for..."></textarea>
+  <button onclick="saveGratitude()" id="saveButton">Save Gratitude</button>
+  
+  <div class="entries-container">
+    <h2 style="text-align: center; color: #003d2e;">Your Gratitude Entries</h2>
+    <div id="entriesList" class="loading">Loading your entries...</div>
+  </div>
+
+  <!-- Add Firebase SDK -->
+  <script type="module">
+    // Import Firebase functions
+    import { 
+      auth, 
+      database, 
+      ref, 
+      push, 
+      set, 
+      onValue,
+      onAuthStateChanged 
+    } from './firebase-config.js';
+
+    // Global variables
+    let currentUser = null;
+
+    // Check authentication state
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+        currentUser = user;
+        console.log('User authenticated:', user.email);
+        loadGratitudeEntries();
+      } else {
+        // User is signed out
+        currentUser = null;
+        document.getElementById('entriesList').innerHTML = 
+          '<p style="text-align: center; color: #666;">Please login to view your gratitude entries.</p>';
+        showError('Please login to save and view your gratitude entries.');
+      }
+    });
+
+    // Save gratitude function
+    window.saveGratitude = async function() {
+      const entry = document.getElementById('journal').value.trim();
+      const saveButton = document.getElementById('saveButton');
+      
+      // Hide any previous errors
+      hideError();
+
+      if (!currentUser) {
+        showError('Please login to save your gratitude entries.');
+        return;
+      }
+
+      if (!entry) {
+        showError('Please write something to save.');
+        return;
+      }
+
+      try {
+        // Disable button during save
+        saveButton.disabled = true;
+        saveButton.textContent = 'Saving...';
+
+        // Create gratitude data
+        const gratitudeData = {
+          entry: entry,
+          date: new Date().toISOString(),
+          timestamp: Date.now()
+        };
+
+        // Save to Firebase under user's UID
+        const gratitudeRef = ref(database, 'users/' + currentUser.uid + '/gratitudeEntries');
+        const newEntryRef = push(gratitudeRef);
+        await set(newEntryRef, gratitudeData);
+
+        // Show success message
+        alert('Gratitude saved successfully! 🙏');
+        
+        // Clear the textarea
+        document.getElementById('journal').value = '';
+        
+        // Reload entries to show the new one
+        loadGratitudeEntries();
+
+      } catch (error) {
+        console.error('Error saving gratitude:', error);
+        showError('Error saving gratitude. Please try again.');
+      } finally {
+        // Re-enable button
+        saveButton.disabled = false;
+        saveButton.textContent = 'Save Gratitude';
+      }
+    };
+
+    // Load gratitude entries function
+    function loadGratitudeEntries() {
+      if (!currentUser) {
+        return;
+      }
+
+      const entriesList = document.getElementById('entriesList');
+      entriesList.innerHTML = '<div class="loading">Loading your entries...</div>';
+
+      const gratitudeRef = ref(database, 'users/' + currentUser.uid + '/gratitudeEntries');
+
+      onValue(gratitudeRef, (snapshot) => {
+        const data = snapshot.val();
+        
+        if (!data) {
+          entriesList.innerHTML = '<p style="text-align: center; color: #666;">No gratitude entries yet. Start by writing your first entry!</p>';
+          return;
+        }
+
+        // Convert object to array and sort by timestamp (newest first)
+        const entries = [];
+        for (let key in data) {
+          entries.push({
+            id: key,
+            ...data[key]
+          });
+        }
+        
+        entries.sort((a, b) => b.timestamp - a.timestamp);
+        
+        // Create HTML for entries
+        let entriesHTML = '';
+        entries.forEach(entry => {
+          const date = new Date(entry.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'long',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          
+          entriesHTML += `
+            <div class="entry">
+              <div class="entry-date">📅 ${date}</div>
+              <div class="entry-content">${entry.entry}</div>
+            </div>
+          `;
+        });
+        
+        entriesList.innerHTML = entriesHTML;
+        
+      }, (error) => {
+        console.error('Error loading entries:', error);
+        entriesList.innerHTML = '<p style="text-align: center; color: #ff0000;">Error loading entries. Please try refreshing the page.</p>';
+      });
+    }
+
+    // Helper functions for error handling
+    function showError(message) {
+      const errorElement = document.getElementById('errorMessage');
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+    }
+
+    function hideError() {
+      const errorElement = document.getElementById('errorMessage');
+      errorElement.style.display = 'none';
+    }
+  </script>
+</body>
+</html>

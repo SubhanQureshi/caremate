@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Affirmations</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e8f7e8;
+      text-align: center;
+      padding: 20px;
+      margin: 0;
+    }
+    header {
+      background-color: #003d2e; /* Dark Green Background */
+      padding: 20px 0;
+    }
+    header h1 {
+      color: #ffffff; /* White text for contrast */
+      margin: 0;
+      font-size: 2rem;
+    }
+    button {
+      background-color: #00735c;
+      color: white;
+      padding: 15px 30px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      margin-top: 20px;
+    }
+    #affirmation {
+      margin-top: 20px;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Affirmations</h1>
+  </header>
+  <button onclick="showAffirmation()">Get an Affirmation</button>
+  <p id="affirmation"></p>
+  <script >
+    const affirmations = [
+      "I am strong and capable.",
+      "I deserve happiness and success.",
+      "I am growing and improving every day.",
+      "I am loved and valued."
+    ];
+    function showAffirmation() {
+      const affirmation = affirmations[Math.floor(Math.random() * affirmations.length)];
+      document.getElementById('affirmation').textContent = affirmation;
+    }
+  </script>
+</body>
+</html>

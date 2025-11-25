@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Firebase Auth</title>
+</head>
+<body>
+    <h1>Testing Firebase Connection</h1>
+    <div id="status">Checking connection...</div>
+    
+    <script type="module">
+        import { auth, database, onAuthStateChanged, ref, set } from './firebase-config.js';
+        
+        const statusDiv = document.getElementById('status');
+        
+        // Test Firebase connection
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                statusDiv.innerHTML = '✅ Firebase connected! User is logged in.';
+                statusDiv.style.color = 'green';
+            } else {
+                statusDiv.innerHTML = '✅ Firebase connected! No user logged in.';
+                statusDiv.style.color = 'blue';
+            }
+        });
+        
+        // Test database connection
+        setTimeout(() => {
+            try {
+                const testRef = ref(database, 'connectionTest');
+                set(testRef, {
+                    timestamp: new Date().toISOString(),
+                    message: 'Test connection successful'
+                }).then(() => {
+                    console.log('✅ Database connection successful');
+                }).catch(error => {
+                    console.error('❌ Database error:', error);
+                });
+            } catch (error) {
+                console.error('❌ Database setup error:', error);
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

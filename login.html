@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareMate - Login</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            background-color: #d4f7d8;
+        }
+        header {
+            background-color: #00735c;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            color: white;
+        }
+        header h1 {
+            background-color: #d4f7d8;
+            color: #00735c;
+            padding: 5px 10px;
+            margin: 0;
+            font-size: 28px;
+            border-radius: 5px;
+        }
+        main {
+            flex: 1;
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            justify-content: space-between;
+            padding: 20px;
+        }
+        .left-side {
+            max-width: 40%;
+            text-align: center;
+        }
+        .left-side img {
+            max-width: 150px;
+            max-height: 150px;
+            margin-bottom: 20px;
+        }
+        .auth-form {
+            background: white;
+            padding: 30px;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+            width: 350px;
+            text-align: center;
+        }
+        .auth-form h2 {
+            margin-bottom: 20px;
+            color: #333;
+        }
+        .auth-form input {
+            width: 100%;
+            padding: 12px;
+            margin: 12px 0;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .auth-form button {
+            background-color: #00735c;
+            color: white;
+            border: none;
+            padding: 12px;
+            border-radius: 5px;
+            cursor: pointer;
+            width: 100%;
+            font-size: 16px;
+            margin-top: 10px;
+        }
+        .auth-form button:hover {
+            background-color: #005f4b;
+        }
+        .auth-form button:disabled {
+            background-color: #cccccc;
+            cursor: not-allowed;
+        }
+        .switch-auth {
+            margin-top: 20px;
+            text-align: center;
+        }
+        .switch-auth a {
+            color: #00735c;
+            text-decoration: none;
+        }
+        .switch-auth a:hover {
+            text-decoration: underline;
+        }
+        .error-message {
+            color: #ff0000;
+            margin-top: 10px;
+            display: none;
+            background-color: #ffe6e6;
+            padding: 10px;
+            border-radius: 5px;
+            border: 1px solid #ff0000;
+        }
+        .remember-me {
+            text-align: left;
+            margin: 10px 0;
+        }
+        .remember-me input {
+            width: auto;
+            margin-right: 5px;
+        }
+        .loading {
+            display: none;
+            text-align: center;
+            margin: 10px 0;
+            color: #00735c;
+        }
+        .forgot-password {
+            text-align: right;
+            margin: 10px 0;
+        }
+        .forgot-password a {
+            color: #00735c;
+            text-decoration: none;
+            font-size: 0.9rem;
+        }
+        .forgot-password a:hover {
+            text-decoration: underline;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>CareMate</h1>
+    </header>
+    <main>
+        <div class="left-side">
+            <img src="Logo.png" alt="CareMate Logo">
+            <p>Welcome back to your mental health companion. Sign in to continue your journey.</p>
+        </div>
+        <div class="auth-form">
+            <h2>Sign In</h2>
+            <form id="loginForm">
+                <input type="email" id="email" name="email" placeholder="Email" required>
+                <input type="password" id="password" name="password" placeholder="Password" required>
+                
+                <div class="remember-me">
+                    <input type="checkbox" id="rememberMe">
+                    <label for="rememberMe">Remember me</label>
+                </div>
+                
+                <div class="forgot-password">
+                    <a href="#" onclick="showForgotPassword()">Forgot Password?</a>
+                </div>
+
+                <div class="loading" id="loading">
+                    <i class="fas fa-spinner fa-spin"></i> Signing in...
+                </div>
+                
+                <button type="submit" id="submitBtn">Sign In</button>
+            </form>
+            
+            <div id="errorMessage" class="error-message"></div>
+            
+            <div class="switch-auth">
+                <p>Don't have an account? <a href="Signup.html">Create one here</a></p>
+            </div>
+        </div>
+    </main>
+
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+    <script type="module">
+        // Import Firebase functions
+        import { 
+            auth, 
+            signInWithEmailAndPassword, 
+            onAuthStateChanged, 
+            database, 
+            ref, 
+            update 
+        } from './firebase-config.js';
+
+        // Get DOM elements
+        const loginForm = document.getElementById('loginForm');
+        const errorMessage = document.getElementById('errorMessage');
+        const loading = document.getElementById('loading');
+        const submitBtn = document.getElementById('submitBtn');
+
+        // Check if user is already logged in
+        onAuthStateChanged(auth, (user) => {
+            if (user) {
+                console.log('User already logged in:', user.email);
+                window.location.href = 'MainScreen.html';
+            }
+        });
+
+        // Handle form submission
+        loginForm.addEventListener('submit', async function(e) {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value.trim();
+            const password = document.getElementById('password').value;
+            const rememberMe = document.getElementById('rememberMe').checked;
+
+            // Reset error message
+            hideError();
+
+            // Show loading state
+            showLoading();
+
+            try {
+                console.log('Signing in user:', email);
+                
+                // Sign in with Firebase Authentication
+                const userCredential = await signInWithEmailAndPassword(auth, email, password);
+                const user = userCredential.user;
+
+                console.log('User signed in successfully:', user.uid);
+
+                // Update last login in database
+                await update(ref(database, 'users/' + user.uid), {
+                    lastLogin: new Date().toISOString()
+                });
+
+                console.log('Last login updated');
+
+                // Firebase automatically handles session persistence
+                if (rememberMe) {
+                    console.log('Remember me enabled - session will be persisted');
+                }
+
+                // Redirect to main screen
+                window.location.href = 'MainScreen.html';
+
+            } catch (error) {
+                console.error('Error signing in:', error);
+                handleAuthError(error);
+            } finally {
+                hideLoading();
+            }
+        });
+
+        // Helper functions
+        function showError(message) {
+            errorMessage.textContent = message;
+            errorMessage.style.display = 'block';
+            errorMessage.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+            errorMessage.textContent = '';
+        }
+
+        function showLoading() {
+            loading.style.display = 'block';
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Signing In...';
+        }
+
+        function hideLoading() {
+            loading.style.display = 'none';
+            submitBtn.disabled = false;
+            submitBtn.textContent = 'Sign In';
+        }
+
+        function handleAuthError(error) {
+            console.log('Login error code:', error.code);
+            
+            switch (error.code) {
+                case 'auth/user-not-found':
+                    showError('No account found with this email. Please sign up first.');
+                    break;
+                case 'auth/wrong-password':
+                    showError('Incorrect password. Please try again.');
+                    break;
+                case 'auth/invalid-email':
+                    showError('Invalid email address. Please check your email format.');
+                    break;
+                case 'auth/user-disabled':
+                    showError('This account has been disabled. Please contact support.');
+                    break;
+                case 'auth/network-request-failed':
+                    showError('Network error. Please check your internet connection.');
+                    break;
+                case 'auth/too-many-requests':
+                    showError('Too many failed login attempts. Please try again later or reset your password.');
+                    break;
+                default:
+                    showError('Error signing in: ' + error.message);
+            }
+        }
+
+        // Forgot password function
+        window.showForgotPassword = function() {
+            const email = prompt('Please enter your email address to reset your password:');
+            if (email) {
+                alert('Password reset feature will be implemented soon! For now, please contact support or try to remember your password.');
+                // Future implementation: sendPasswordResetEmail(auth, email);
+            }
+        }
+    </script>
+</body>
+</html>

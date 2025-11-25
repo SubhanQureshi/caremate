@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>4-7-8 Breathing</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #e8f7e8;
+      margin: 0;
+    }
+    header {
+      background-color: #004d40; /* Dark Green Background */
+      padding: 20px 0;
+    }
+    header h1 {
+      color: white; /* White text for contrast */
+      margin: 0;
+      font-size: 2rem;
+    }
+    button {
+      background-color: #004d40;
+      color: white;
+      padding: 15px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.2rem;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>4-7-8 Breathing Exercise</h1>
+  </header>
+  <p>Follow the prompts to relax your breathing.</p>
+  <button onclick="start478Breathing()">Start Exercise</button>
+  <script >
+    function start478Breathing() {
+      alert('Inhale for 4 seconds...');
+      setTimeout(() => {
+        alert('Hold for 7 seconds...');
+        setTimeout(() => {
+          alert('Exhale for 8 seconds...');
+        }, 7000);
+      }, 4000);
+    }
+
+  </script>
+</body>
+</html>

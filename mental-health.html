@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mental Health Tracker</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #d4f7d8;
+      margin: 0;
+      padding: 0;
+    }
+    header, footer {
+      background-color: #00735c;
+      color: white;
+      display: flex;
+      align-items: center;
+      padding: 10px 20px;
+      height: 70px;
+    }
+
+    header img {
+      width: 100px;
+      margin-right: 15px;
+    }
+
+    header h1 {
+      font-size: 2rem;
+      margin: 0;
+    }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      background-color: #00735c;
+      padding: 0.5rem 0;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 1rem;
+      padding: 0.5rem 1rem;
+      background-color: #016A43;
+      transition: background-color 0.3s ease, box-shadow 0.3s ease;
+    }
+    nav a:hover {
+      background-color: #004d32;
+      box-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99;
+    }
+    
+    main {
+      padding: 20px;
+    }
+    
+    .mood-selection {
+      text-align: center;
+      margin-bottom: 30px;
+    }
+    
+    .mood-selection button {
+      font-size: 2rem;
+      padding: 20px;
+      border-radius: 50%;
+      border: none;
+      cursor: pointer;
+      margin: 10px;
+      transition: transform 0.3s;
+    }
+    
+    .mood-selection button:hover {
+      transform: scale(1.1);
+    }
+    
+    .mood-selection .happy { background-color: #ffeb3b; }
+    .mood-selection .sad { background-color: #2196f3; }
+    .mood-selection .stressed { background-color: #f44336; }
+    .mood-selection .calm { background-color: #4caf50; }
+
+    .notes-section {
+      margin-bottom: 30px;
+    }
+
+    .notes-section label {
+      font-size: 1.2rem;
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .notes-section textarea {
+      width: 100%;
+      height: 150px;
+      padding: 10px;
+      font-size: 1rem;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    .tags-section {
+      margin-top: 20px;
+    }
+
+    .tags-section input {
+      padding: 10px;
+      font-size: 1rem;
+      margin: 10px 0;
+      width: 100%;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+    }
+
+    .graph-section {
+      margin-top: 40px;
+      text-align: center;
+    }
+
+    .graph-section h2 {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    .graph-placeholder {
+      width: 100%;
+      height: 300px;
+      margin-top: 10px;
+    }
+    
+    .error-message {
+      color: #ff0000;
+      text-align: center;
+      padding: 10px;
+      background-color: #ffe6e6;
+      border-radius: 5px;
+      margin: 10px 0;
+      display: none;
+    }
+    
+    .loading {
+      text-align: center;
+      color: #666;
+      font-style: italic;
+      padding: 10px;
+    }
+    
+    .mood-history {
+      margin-top: 40px;
+      background: white;
+      padding: 20px;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    }
+    
+    .mood-entry {
+      border-left: 4px solid;
+      padding: 10px 15px;
+      margin: 10px 0;
+      background: #f9f9f9;
+    }
+    
+    .mood-entry.happy { border-left-color: #ffeb3b; }
+    .mood-entry.sad { border-left-color: #2196f3; }
+    .mood-entry.stressed { border-left-color: #f44336; }
+    .mood-entry.calm { border-left-color: #4caf50; }
+    
+    .mood-date {
+      font-size: 0.9rem;
+      color: #666;
+      margin-bottom: 5px;
+    }
+    
+    .mood-notes {
+      margin-top: 5px;
+      color: #333;
+    }
+    
+    .mood-tags {
+      margin-top: 5px;
+      font-size: 0.8rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <img src="Logo.png" alt="CareMate Logo">
+    <h1>Mental Health Tracker</h1>
+  </header>
+      
+  <nav>
+    <a href="MainScreen.html"><i class="fas fa-home"></i> Home</a>
+    <a href="mental-health.html"><i class="fas fa-brain"></i> Mental Health</a>
+    <a href="guided-support.html"><i class="fas fa-hands-helping"></i> Support</a>
+    <a href="Sleep tracker.html"><i class="fas fa-bed"></i> Sleep Tracker</a>
+  </nav>
+
+  <main>
+    <div id="errorMessage" class="error-message"></div>
+    
+    <!-- Mood Selection Section -->
+    <section class="mood-selection">
+      <h2>Select Your Mood</h2>
+      <button class="happy" title="Happy" onclick="selectMood('Happy')">😊</button>
+      <button class="sad" title="Sad" onclick="selectMood('Sad')">😔</button>
+      <button class="stressed" title="Stressed" onclick="selectMood('Stressed')">😰</button>
+      <button class="calm" title="Calm" onclick="selectMood('Calm')">😌</button>
+    </section>
+
+    <!-- Notes Section -->
+    <section class="notes-section">
+      <label for="moodNotes">Notes (Optional)</label>
+      <textarea id="moodNotes" placeholder="Write down your thoughts or reasons for your mood change..."></textarea>
+    </section>
+
+    <!-- Tags Section -->
+    <section class="tags-section">
+      <label for="tags">Add Tags (Optional)</label>
+      <input id="tags" type="text" placeholder="e.g., work stress, family, exercise">
+    </section>
+
+    <!-- Graphical Reports Section -->
+    <section class="graph-section">
+      <h2>Mood Distribution</h2>
+      <p>Your overall mood patterns</p>
+      <div class="graph-placeholder">
+        <canvas id="moodChart"></canvas>
+      </div>
+    </section>
+    
+    <!-- Mood History Section -->
+    <section class="mood-history">
+      <h2>Recent Mood Entries</h2>
+      <div id="moodHistory" class="loading">Loading your mood history...</div>
+    </section>
+  </main>
+
+  <!-- Firebase Integration -->
+  <script type="module">
+    // Import Firebase functions
+    import { 
+      auth, 
+      database, 
+      ref, 
+      push, 
+      set, 
+      onValue,
+      onAuthStateChanged
+    } from './firebase-config.js';
+
+    // Global variables
+    let currentUser = null;
+    let moodChart = null;
+
+    // Initialize the chart when the page loads
+    function initializeChart() {
+      const ctx = document.getElementById('moodChart').getContext('2d');
+      
+      // Initial data with zeros
+      const initialData = {
+        Happy: 0,
+        Sad: 0,
+        Stressed: 0,
+        Calm: 0
+      };
+
+      moodChart = new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: ['Happy', 'Sad', 'Stressed', 'Calm'],
+          datasets: [{
+            label: 'Mood Distribution',
+            data: [initialData.Happy, initialData.Sad, initialData.Stressed, initialData.Calm],
+            backgroundColor: ['#ffeb3b', '#2196f3', '#f44336', '#4caf50'],
+            borderColor: ['#fff', '#fff', '#fff', '#fff'],
+            borderWidth: 1
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              position: 'top',
+            },
+            tooltip: {
+              callbacks: {
+                label: function(tooltipItem) {
+                  return tooltipItem.label + ': ' + tooltipItem.raw + ' entries';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Check authentication state
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        // User is signed in
+        currentUser = user;
+        console.log('User authenticated:', user.email);
+        
+        // Initialize chart first
+        if (!moodChart) {
+          initializeChart();
+        }
+        
+        // Then load data
+        loadMoodData();
+        loadMoodHistory();
+      } else {
+        // User is signed out
+        currentUser = null;
+        document.getElementById('moodHistory').innerHTML = 
+          '<p style="text-align: center; color: #666;">Please login to view your mood history.</p>';
+        showError('Please login to track your mood.');
+        
+        // Initialize chart even if not logged in (will show zeros)
+        if (!moodChart) {
+          initializeChart();
+        }
+      }
+    });
+
+    // Function to handle mood selection
+    window.selectMood = async function(mood) {
+      // Hide any previous errors
+      hideError();
+
+      if (!currentUser) {
+        showError('Please login to track your mood.');
+        return;
+      }
+
+      const notes = document.getElementById('moodNotes').value.trim();
+      const tags = document.getElementById('tags').value.trim();
+
+      try {
+        // Create mood data object
+        const moodData = {
+          mood: mood,
+          emoji: getMoodEmoji(mood),
+          notes: notes,
+          tags: tags,
+          date: new Date().toISOString(),
+          timestamp: Date.now()
+        };
+
+        // Save to Firebase under user's UID
+        const moodRef = ref(database, 'users/' + currentUser.uid + '/moodEntries');
+        const newMoodRef = push(moodRef);
+        await set(newMoodRef, moodData);
+
+        // Clear form fields
+        document.getElementById('moodNotes').value = '';
+        document.getElementById('tags').value = '';
+
+        // Show success message with emoji
+        alert(`Mood recorded! ${getMoodEmoji(mood)}`);
+
+        // The chart will update automatically via the onValue listener
+
+      } catch (error) {
+        console.error('Error saving mood:', error);
+        showError('Error saving mood. Please try again.');
+      }
+    };
+
+    // Helper function to get emoji for mood
+    function getMoodEmoji(mood) {
+      const emojis = {
+        'Happy': '😊',
+        'Sad': '😔',
+        'Stressed': '😰',
+        'Calm': '😌'
+      };
+      return emojis[mood] || '😐';
+    }
+
+    // Load mood data from Firebase and update chart
+    function loadMoodData() {
+      if (!currentUser) return;
+
+      const moodRef = ref(database, 'users/' + currentUser.uid + '/moodEntries');
+
+      onValue(moodRef, (snapshot) => {
+        const data = snapshot.val();
+        
+        // Initialize mood counts
+        const moodCounts = { Happy: 0, Sad: 0, Stressed: 0, Calm: 0 };
+        
+        if (data) {
+          // Count moods
+          for (let key in data) {
+            const mood = data[key].mood;
+            if (moodCounts.hasOwnProperty(mood)) {
+              moodCounts[mood]++;
+            }
+          }
+        }
+
+        // Update the chart with actual data
+        updateChart(moodCounts);
+        
+      }, (error) => {
+        console.error('Error loading mood data:', error);
+      });
+    }
+
+    // Load mood history
+    function loadMoodHistory() {
+      if (!currentUser) return;
+
+      const moodHistoryDiv = document.getElementById('moodHistory');
+      moodHistoryDiv.innerHTML = '<div class="loading">Loading your mood history...</div>';
+
+      const moodRef = ref(database, 'users/' + currentUser.uid + '/moodEntries');
+
+      onValue(moodRef, (snapshot) => {
+        const data = snapshot.val();
+        
+        if (!data) {
+          moodHistoryDiv.innerHTML = '<p style="text-align: center; color: #666;">No mood entries yet. Select a mood to get started!</p>';
+          return;
+        }
+
+        // Convert object to array and sort by timestamp (newest first)
+        const entries = [];
+        for (let key in data) {
+          entries.push({
+            id: key,
+            ...data[key]
+          });
+        }
+        
+        entries.sort((a, b) => b.timestamp - a.timestamp);
+        
+        // Show only last 10 entries
+        const recentEntries = entries.slice(0, 10);
+        
+        // Create HTML for mood history
+        let historyHTML = '';
+        recentEntries.forEach(entry => {
+          const date = new Date(entry.date).toLocaleDateString('en-US', {
+            year: 'numeric',
+            month: 'short',
+            day: 'numeric',
+            hour: '2-digit',
+            minute: '2-digit'
+          });
+          
+          historyHTML += `
+            <div class="mood-entry ${entry.mood.toLowerCase()}">
+              <div class="mood-date">📅 ${date}</div>
+              <div><strong>${entry.emoji} ${entry.mood}</strong></div>
+              ${entry.notes ? `<div class="mood-notes">${entry.notes}</div>` : ''}
+              ${entry.tags ? `<div class="mood-tags">Tags: ${entry.tags}</div>` : ''}
+            </div>
+          `;
+        });
+        
+        moodHistoryDiv.innerHTML = historyHTML;
+        
+      }, (error) => {
+        console.error('Error loading mood history:', error);
+        moodHistoryDiv.innerHTML = '<p style="text-align: center; color: #ff0000;">Error loading mood history. Please try refreshing.</p>';
+      });
+    }
+
+    // Update the chart with new data
+    function updateChart(moodCounts) {
+      if (!moodChart) {
+        console.error('Chart not initialized');
+        return;
+      }
+      
+      moodChart.data.datasets[0].data = [
+        moodCounts.Happy,
+        moodCounts.Sad,
+        moodCounts.Stressed,
+        moodCounts.Calm
+      ];
+      moodChart.update();
+    }
+
+    // Helper functions for error handling
+    function showError(message) {
+      const errorElement = document.getElementById('errorMessage');
+      errorElement.textContent = message;
+      errorElement.style.display = 'block';
+    }
+
+    function hideError() {
+      const errorElement = document.getElementById('errorMessage');
+      errorElement.style.display = 'none';
+    }
+
+    // Initialize chart when page loads (regardless of auth status)
+    document.addEventListener('DOMContentLoaded', function() {
+      initializeChart();
+    });
+  </script>
+</body>
+</html>

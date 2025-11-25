@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Guided Support</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #e8f7e8; /* Light green background */
+      margin: 0;
+      padding: 0;
+      animation: backgroundFade 10s infinite alternate;
+    }
+
+    @keyframes backgroundFade {
+      0% {
+        background-color: #e8f7e8;
+      }
+      50% {
+        background-color: #d3f4d3;
+      }
+      100% {
+        background-color: #e8f7e8;
+      }
+    }
+
+    header, footer {
+            background-color: #00735c;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            height: 70px;
+        }
+
+        header img {
+            width: 100px;
+            margin-right: 15px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+    nav {
+      display: flex;
+      justify-content: center;
+      background-color: #00735c;
+      padding: 0.5rem 0;
+    }
+    nav a {
+      color: white;
+      text-decoration: none;
+      margin: 0 1rem;
+      padding: 0.5rem 1rem;
+      background-color: #016A43; /* Button background color */
+      transition: background-color 0.3s ease, box-shadow 0.3s ease; /* Added box-shadow transition */
+    }
+    nav a:hover {
+      background-color: #004d32; /* Darker button background on hover */
+      box-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99; /* Glow effect */
+    }
+    main {
+      padding: 20px;
+    }
+    .section {
+      margin-bottom: 30px;
+    }
+    h2 {
+      font-size: 1.8rem;
+      color: #00735c;
+      text-align: center;
+      margin-bottom: 20px;
+    }
+    button {
+      background-color: #4caf50;
+      color: white;
+      padding: 10px;
+      font-size: 1rem;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      width: 200px;
+      display: block;
+      margin: 10px auto;
+    }
+    button:hover {
+      transform: scale(1.05);
+    }
+    .exercise-option {
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+    }
+    .exercise-option a {
+      text-decoration: none;
+      background-color: #4caf50;
+      color: white;
+      padding: 15px;
+      font-size: 1.2rem;
+      border-radius: 5px;
+      transition: transform 0.3s ease, box-shadow 0.3s ease;
+      width: 200px;
+      text-align: center;
+      animation: fadeIn 1s ease;
+    }
+    .exercise-option a:hover {
+      transform: scale(1.1);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(-10px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+    .audio-video-section {
+      display: flex;
+      justify-content: space-between;
+      gap: 15px;
+    }
+    .audio-video-section iframe {
+      width: 48%;
+      height: 200px;
+      border-radius: 5px;
+    }
+    .gamified-rewards {
+      text-align: center;
+      font-size: 1.2rem;
+    }
+    .stress-tips {
+      background-color: #f4f4f4;
+      padding: 20px;
+      border-radius: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    }
+    .stress-tips p {
+      font-size: 1.2rem;
+      margin: 10px 0;
+    }
+    .stress-tips ul {
+      list-style: none;
+      padding-left: 20px;
+    }
+    .stress-tips ul li {
+      margin: 5px 0;
+    }
+  </style>
+</head>
+<body>
+  <header>
+
+        <img src="Logo.png" alt="CareMate Logo">
+    <h1>Guided Support for Mental Health</h1>
+  </header>
+  
+    <nav>
+        <a href="MainScreen.html"><i class="fas fa-home"></i> Home</a>
+        <a href="mental-health.html"><i class="fas fa-brain"></i> Mental Health</a>
+        <a href="guided-support.html"><i class="fas fa-hands-helping"></i> Support</a>
+        <a href="Sleep tracker.html"><i class="fas fa-bed"></i> Sleep Tracker</a>
+    </nav>
+
+
+  <main>
+    <!-- Personalized Mindfulness Exercises Section -->
+    <section class="section">
+      <h2>Personalized Mindfulness Exercises</h2>
+      <div class="exercise-option">
+        <a href="gratitude.html">Gratitude Journaling</a>
+        <a href="affirmation.html">Affirmations</a>
+      </div>
+    </section>
+
+    <!-- Breathing Exercises Section -->
+    <section class="section">
+      <h2>Breathing Exercises</h2>
+      <div class="exercise-option">
+        <a href="478-breathing.html">4-7-8 Breathing</a>
+        <a href="box-breathing.html">Box Breathing</a>
+      </div>
+    </section>
+
+    <!-- Audio and Video Guidance Section -->
+    <section class="section">
+      <h2>Audio and Video Guidance</h2>
+      <div class="audio-video-section">
+        <!-- Embed audio or video content -->
+        <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="Guided Meditation" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        <iframe src="https://www.youtube.com/embed/kq1vR3r1iDg" title="Relaxing Nature Sounds" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+      </div>
+    </section>
+
+    <!-- Gamified Rewards Section -->
+    <section class="section gamified-rewards">
+      <h2>Gamified Rewards</h2>
+      <p>Earn points or badges by completing mindfulness exercises!</p>
+      <button onclick="alert('Congratulations! You earned 10 points for completing the session!')">Complete Session</button>
+    </section>
+
+    <!-- Stress Relief Tips Section -->
+    <section class="section stress-tips">
+      <h2>Stress Relief Tips</h2>
+      <p>Here are some tips based on your mood:</p>
+      <ul>
+        <li>Take a short walk outside to clear your mind.</li>
+        <li>Try this stretching routine to relax your muscles.</li>
+        <li>Listen to calming nature sounds to reduce anxiety.</li>
+      </ul>
+    </section>
+  </main>
+  
+</body>
+</html>

@@ -1,0 +1,558 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CareMate - Sleep Tracker</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <style>
+        @keyframes backgroundFade {
+            0% { background-color: #e0f7fa; }
+            50% { background-color: #80cbc4; }
+            100% { background-color: #e0f7fa; }
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            animation: backgroundFade 10s infinite;
+        }
+
+        header, footer {
+            background-color: #00735c;
+            color: white;
+            display: flex;
+            align-items: center;
+            padding: 10px 20px;
+            height: 70px;
+        }
+
+        header img {
+            width: 100px;
+            margin-right: 15px;
+        }
+
+        header h1 {
+            font-size: 2rem;
+            margin: 0;
+        }
+
+        nav {
+            background-color: #00735c;
+            display: flex;
+            justify-content: center;
+            padding: 15px 0;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            padding: 10px 20px;
+            border-radius: 5px;
+            display: flex;
+            align-items: center;
+            font-size: 1rem;
+            background-color: #016A43;
+            transition: background-color 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        nav a i {
+            margin-right: 8px;
+        }
+
+        nav a:hover {
+            background-color: #004d32;
+            box-shadow: 0 0 10px #00ff99, 0 0 20px #00ff99;
+        }
+
+        main {
+            padding: 30px 20px;
+            flex: 1;
+            background-color: #f4f7fa;
+        }
+
+        main h2 {
+            text-align: center;
+            color: #00735c;
+        }
+
+        .sleep-container {
+            max-width: 600px;
+            margin: 20px auto;
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sleep-input {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+
+        .sleep-input input, .sleep-input select {
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            flex: 1;
+        }
+
+        .sleep-input button {
+            padding: 10px 20px;
+            font-size: 16px;
+            color: white;
+            background-color: #00735c;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            flex-basis: 100%;
+        }
+
+        .sleep-input button:hover {
+            background-color: #004d32;
+        }
+
+        .sleep-list {
+            list-style: none;
+            padding: 0;
+        }
+
+        .sleep-list li {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin-bottom: 10px;
+            background-color: #f9f9f9;
+            border: 1px solid #e0e0e0;
+            border-radius: 5px;
+        }
+
+        .sleep-list li span {
+            flex: 1;
+        }
+
+        .sleep-list li button {
+            padding: 5px 10px;
+            font-size: 14px;
+            color: white;
+            background-color: #00735c;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .sleep-list li button:hover {
+            background-color: #004d32;
+        }
+
+        footer {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <img src="Logo.png" alt="CareMate Logo">
+        <h1>CareMate</h1>
+    </header>
+
+    <nav>
+        <a href="MainScreen.html"><i class="fas fa-home"></i> Home</a>
+        <a href="mental-health.html"><i class="fas fa-brain"></i> Mental Health</a>
+        <a href="guided-support.html"><i class="fas fa-hands-helping"></i> Support</a>
+        <a href="SleepTracker.html"><i class="fas fa-bed"></i> Sleep Tracker</a>
+    </nav>
+
+    <main>
+        <h2>Sleep Quality Tracker</h2>
+        <div class="sleep-container">
+            <div class="sleep-input">
+                <input type="date" id="sleepDate">
+                <input type="time" id="bedtime">
+                <input type="time" id="wakeTime">
+                <select id="disturbances">
+                    <option value="0">No Disturbances</option>
+                    <option value="1">Slight Disturbances</option>
+                    <option value="2">Frequent Disturbances</option>
+                </select>
+                <button onclick="sleepTracker.logSleep()">Log Sleep</button>
+            </div>
+            <ul class="sleep-list" id="sleepList"></ul>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 CareMate. All rights reserved.</p>
+    </footer>
+
+    <!-- Design Patterns Implementation -->
+    <script>
+        // =============================================
+        // FACTORY PATTERN: Sleep Record Factory
+        // =============================================
+        class SleepRecordFactory {
+            static createSleepRecord(sleepDate, bedtime, wakeTime, disturbances) {
+                // Calculate sleep duration
+                const bedTimeDate = new Date(`1970-01-01T${bedtime}:00`);
+                const wakeTimeDate = new Date(`1970-01-01T${wakeTime}:00`);
+                let sleepDuration = (wakeTimeDate - bedTimeDate) / 1000 / 60 / 60;
+                if (sleepDuration < 0) sleepDuration += 24;
+
+                // Determine sleep quality
+                let sleepQuality = "Poor";
+                if (sleepDuration >= 7) {
+                    sleepQuality = "Good";
+                } else if (sleepDuration >= 5) {
+                    sleepQuality = "Average";
+                }
+
+                // Get recommendations
+                const recommendations = this.getSleepRecommendations(sleepQuality, disturbances);
+
+                return {
+                    sleepDate,
+                    bedtime,
+                    wakeTime,
+                    disturbances,
+                    sleepDuration: sleepDuration.toFixed(2),
+                    sleepQuality,
+                    recommendations,
+                    timestamp: Date.now(),
+                    id: this.generateId()
+                };
+            }
+
+            static generateId() {
+                return 'sleep_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+            }
+
+            static getSleepRecommendations(quality, disturbances) {
+                let tips = "";
+
+                if (quality === "Good") {
+                    tips = "Keep up the good work! Try to maintain a consistent bedtime.";
+                } else if (quality === "Average") {
+                    tips = "Consider relaxing before bed. Avoid caffeine and screens an hour before sleep.";
+                } else if (quality === "Poor") {
+                    tips = "You may want to adjust your sleep routine. Try some relaxation techniques or check for sleep disturbances.";
+                }
+
+                if (disturbances == "1") {
+                    tips += " Consider improving your sleep environment by minimizing noise or light.";
+                } else if (disturbances == "2") {
+                    tips += " Frequent disturbances suggest you should explore potential sleep disorders or other health issues.";
+                }
+
+                return tips;
+            }
+        }
+
+        // =============================================
+        // OBSERVER PATTERN: Sleep Data Observer
+        // =============================================
+        class SleepDataObserver {
+            constructor() {
+                this.observers = [];
+                this.sleepRecords = [];
+            }
+
+            // Subscribe to changes
+            subscribe(observer) {
+                this.observers.push(observer);
+            }
+
+            // Unsubscribe from changes
+            unsubscribe(observer) {
+                this.observers = this.observers.filter(obs => obs !== observer);
+            }
+
+            // Notify all observers
+            notify(data) {
+                this.observers.forEach(observer => observer.update(data));
+            }
+
+            // Add sleep record and notify observers
+            addRecord(record) {
+                this.sleepRecords.unshift(record); // Add to beginning (newest first)
+                this.notify({
+                    type: 'RECORD_ADDED',
+                    record: record
+                });
+            }
+
+            // Remove sleep record and notify observers
+            removeRecord(recordId) {
+                this.sleepRecords = this.sleepRecords.filter(record => record.id !== recordId);
+                this.notify({
+                    type: 'RECORD_REMOVED',
+                    recordId: recordId
+                });
+            }
+
+            // Get all records
+            getRecords() {
+                return [...this.sleepRecords]; // Return copy to prevent mutation
+            }
+        }
+
+        // =============================================
+        // UI OBSERVER: Handles UI Updates
+        // =============================================
+        class UIObserver {
+            constructor(sleepListElement) {
+                this.sleepListElement = sleepListElement;
+            }
+
+            update(data) {
+                switch (data.type) {
+                    case 'RECORD_ADDED':
+                        this.addRecordToUI(data.record);
+                        break;
+                    case 'RECORD_REMOVED':
+                        this.removeRecordFromUI(data.recordId);
+                        break;
+                    case 'RECORDS_LOADED':
+                        this.loadRecordsToUI(data.records);
+                        break;
+                }
+            }
+
+            addRecordToUI(record) {
+                const sleepLog = document.createElement('li');
+                sleepLog.setAttribute('data-record-id', record.id);
+                sleepLog.innerHTML = `
+                    <span>
+                        <strong>${record.sleepDate}</strong><br>
+                        Bedtime: ${record.bedtime}<br>
+                        Wake Time: ${record.wakeTime}<br>
+                        Duration: ${record.sleepDuration} hrs<br>
+                        Quality: ${record.sleepQuality}
+                    </span>
+                    <span>${record.recommendations}</span>
+                    <button onclick="sleepTracker.deleteSleepRecord('${record.id}')">Delete</button>
+                `;
+                this.sleepListElement.prepend(sleepLog); // Add to top
+            }
+
+            removeRecordFromUI(recordId) {
+                const recordElement = this.sleepListElement.querySelector(`[data-record-id="${recordId}"]`);
+                if (recordElement) {
+                    recordElement.remove();
+                }
+            }
+
+            loadRecordsToUI(records) {
+                this.sleepListElement.innerHTML = '';
+                records.forEach(record => this.addRecordToUI(record));
+            }
+
+            clearUI() {
+                this.sleepListElement.innerHTML = '<li>No sleep records yet</li>';
+            }
+        }
+
+        // =============================================
+        // MAIN SLEEP TRACKER CONTROLLER
+        // =============================================
+        class SleepTracker {
+            constructor() {
+                this.sleepObserver = new SleepDataObserver();
+                this.uiObserver = new UIObserver(document.getElementById('sleepList'));
+                this.sleepObserver.subscribe(this.uiObserver);
+                
+                this.currentUser = null;
+                this.init();
+            }
+
+            async init() {
+                // Set today's date as default
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('sleepDate').value = today;
+                
+                // Initialize Firebase
+                await this.initializeFirebase();
+            }
+
+            async initializeFirebase() {
+                try {
+                    const { auth, onAuthStateChanged } = await import('./firebase-config.js');
+                    
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            this.currentUser = user;
+                            console.log('✅ User logged in:', user.email);
+                            this.loadSleepRecordsFromFirebase();
+                        } else {
+                            this.currentUser = null;
+                            console.log('⚠️ User not logged in');
+                            this.uiObserver.clearUI();
+                        }
+                    });
+                } catch (error) {
+                    console.error('❌ Error initializing Firebase:', error);
+                }
+            }
+
+            // Main function to log sleep
+            logSleep() {
+                const sleepDate = document.getElementById('sleepDate').value;
+                const bedtime = document.getElementById('bedtime').value;
+                const wakeTime = document.getElementById('wakeTime').value;
+                const disturbances = document.getElementById('disturbances').value;
+
+                if (!sleepDate || !bedtime || !wakeTime) {
+                    alert("Please fill in all fields!");
+                    return;
+                }
+
+                // Use Factory Pattern to create sleep record
+                const sleepRecord = SleepRecordFactory.createSleepRecord(
+                    sleepDate, bedtime, wakeTime, disturbances
+                );
+
+                // Add to observer (which will update UI)
+                this.sleepObserver.addRecord(sleepRecord);
+
+                // Save to Firebase
+                this.saveToFirebase(sleepRecord);
+
+                // Clear form
+                document.getElementById('sleepDate').value = '';
+                document.getElementById('bedtime').value = '';
+                document.getElementById('wakeTime').value = '';
+                document.getElementById('disturbances').value = '0';
+
+                // Set today's date again
+                const today = new Date().toISOString().split('T')[0];
+                document.getElementById('sleepDate').value = today;
+            }
+
+            async saveToFirebase(sleepRecord) {
+                if (!this.currentUser) {
+                    console.log('⚠️ Not saving to Firebase: User not logged in');
+                    return;
+                }
+
+                try {
+                    const { database, ref, push, set } = await import('./firebase-config.js');
+                    
+                    const sleepData = {
+                        ...sleepRecord,
+                        firebaseId: sleepRecord.id // Store our generated ID in Firebase
+                    };
+
+                    const sleepRef = ref(database, 'users/' + this.currentUser.uid + '/sleepRecords');
+                    const newSleepRef = push(sleepRef);
+                    await set(newSleepRef, sleepData);
+
+                    console.log('✅ Sleep record saved to Firebase!');
+                    
+                } catch (error) {
+                    console.error('❌ Error saving to Firebase:', error);
+                }
+            }
+
+            async loadSleepRecordsFromFirebase() {
+                if (!this.currentUser) return;
+
+                try {
+                    const { database, ref, onValue } = await import('./firebase-config.js');
+                    
+                    const sleepRef = ref(database, 'users/' + this.currentUser.uid + '/sleepRecords');
+                    
+                    onValue(sleepRef, (snapshot) => {
+                        const data = snapshot.val();
+                        
+                        if (!data) {
+                            console.log('📭 No sleep records found in Firebase');
+                            this.uiObserver.clearUI();
+                            return;
+                        }
+
+                        console.log(`📦 Found ${Object.keys(data).length} sleep records in Firebase`);
+
+                        // Convert object to array
+                        const records = [];
+                        for (let key in data) {
+                            records.push({
+                                ...data[key],
+                                firebaseKey: key // Store Firebase key for deletion
+                            });
+                        }
+                        
+                        // Sort by timestamp (newest first)
+                        records.sort((a, b) => b.timestamp - a.timestamp);
+
+                        // Update observer with loaded records
+                        this.sleepObserver.notify({
+                            type: 'RECORDS_LOADED',
+                            records: records
+                        });
+
+                        console.log('✅ Sleep records loaded from Firebase');
+                    });
+                } catch (error) {
+                    console.error('❌ Error loading from Firebase:', error);
+                }
+            }
+
+            async deleteSleepRecord(recordId) {
+                if (!this.currentUser) {
+                    alert("Please login to delete records");
+                    return;
+                }
+
+                if (confirm('Are you sure you want to delete this sleep record?')) {
+                    // Remove from local observer (which will update UI)
+                    this.sleepObserver.removeRecord(recordId);
+
+                    // Remove from Firebase
+                    await this.deleteFromFirebase(recordId);
+                }
+            }
+
+            async deleteFromFirebase(recordId) {
+                if (!this.currentUser) return;
+
+                try {
+                    const { database, ref, remove, query, orderByChild, equalTo, get } = await import('./firebase-config.js');
+                    
+                    // Find the record in Firebase by our custom ID
+                    const sleepRef = ref(database, 'users/' + this.currentUser.uid + '/sleepRecords');
+                    const recordsQuery = query(sleepRef, orderByChild('firebaseId'), equalTo(recordId));
+                    
+                    const snapshot = await get(recordsQuery);
+                    if (snapshot.exists()) {
+                        snapshot.forEach((childSnapshot) => {
+                            remove(childSnapshot.ref);
+                        });
+                        console.log('✅ Record deleted from Firebase');
+                    }
+                } catch (error) {
+                    console.error('❌ Error deleting from Firebase:', error);
+                    alert('Error deleting sleep record from cloud');
+                }
+            }
+        }
+
+        // Initialize Sleep Tracker when DOM is loaded
+        let sleepTracker;
+        document.addEventListener('DOMContentLoaded', function() {
+            sleepTracker = new SleepTracker();
+            window.sleepTracker = sleepTracker; // Make it globally available
+        });
+    </script>
+</body>
+</html>

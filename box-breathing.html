@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Box Breathing</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      padding: 20px;
+      background-color: #e8f7e8;;
+    }
+    h1 {
+      color: #004d40;
+    }
+    button {
+      background-color: #004d40;
+      color: white;
+      padding: 15px 30px;
+      border: none;
+      border-radius: 5px;
+      font-size: 1.2rem;
+    }
+  </style>
+</head>
+<body>
+  <h1>Box Breathing Exercise</h1>
+  <button onclick="startBoxBreathing()">Start Exercise</button>
+  <script >
+    function startBoxBreathing() {
+      alert('Inhale for 4 seconds...');
+      setTimeout(() => {
+        alert('Hold for 4 seconds...');
+        setTimeout(() => {
+          alert('Exhale for 4 seconds...');
+          setTimeout(() => {
+            alert('Hold for 4 seconds...');
+          }, 4000);
+        }, 4000);
+      }, 4000);
+    }
+  </script>
+</body>
+</html>
